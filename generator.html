@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>台灣證號自動生成器 (QA 版)</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333; }
+        .item { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #666; }
+        .result-wrapper { display: flex; gap: 10px; }
+        input { flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 1.1rem; }
+        button { cursor: pointer; background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 4px; transition: 0.2s; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>證號自動生成器</h2>
+    
+    <div class="item">
+        <label>統一編號</label>
+        <div class="result-wrapper">
+            <input type="text" id="taxId" readonly>
+            <button onclick="generateTaxId()">刷新</button>
+        </div>
+    </div>
+
+    <div class="item">
+        <label>身分證字號</label>
+        <div class="result-wrapper">
+            <input type="text" id="personalId" readonly>
+            <button onclick="generatePersonalId()">刷新</button>
+        </div>
+    </div>
+
+    <div class="item">
+        <label>新版居留證號 (2021後)</label>
+        <div class="result-wrapper">
+            <input type="text" id="newResidentId" readonly>
+            <button onclick="generateNewResidentId()">刷新</button>
+        </div>
+    </div>
+
+    <div class="item">
+        <label>舊版居留證號</label>
+        <div class="result-wrapper">
+            <input type="text" id="oldResidentId" readonly>
+            <button onclick="generateOldResidentId()">刷新</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const CITY_CODE = {
+    A: 10, B: 11, C: 12, D: 13, E: 14, F: 15, G: 16, H: 17, I: 34, J: 18, K: 19, L: 20, M: 21,
+    N: 22, O: 35, P: 23, Q: 24, R: 25, S: 26, T: 27, U: 28, V: 29, W: 32, X: 30, Y: 31, Z: 33
+};
+
+function getRandomCity() {
+    const letters = Object.keys(CITY_CODE);
+    return letters[Math.floor(Math.random() * letters.length)];
+}
+
+// 1. 統一編號生成
+function generateTaxId() {
+    const weights = [1, 2, 1, 2, 1, 2, 4, 1];
+    while (true) {
+        let nums = Array.from({length: 7}, () => Math.floor(Math.random() * 10));
+        let sum = 0;
+        nums.forEach((n, i) => {
+            let res = n * weights[i];
+            sum += Math.floor(res / 10) + (res % 10);
+        });
+        
+        for (let last = 0; last < 10; last++) {
+            let total = sum + (last * weights[7]);
+            if (total % 5 === 0) {
+                document.getElementById('taxId').value = nums.join('') + last;
+                return;
+            }
+        }
+    }
+}
+
+// 2. 身分證 & 新版居留證共用邏輯
+function generateTaiwanId(isResident = false) {
+    const city = getRandomCity();
+    const cityNum = CITY_CODE[city];
+    const n0 = Math.floor(cityNum / 10);
+    const n1 = cityNum % 10;
+    
+    // 第二碼：身分證 1-2, 新版居留證 8-9
+    const secondDigit = isResident ? (Math.random() > 0.5 ? 8 : 9) : (Math.random() > 0.5 ? 1 : 2);
+    let nums = [secondDigit, ...Array.from({length: 7}, () => Math.floor(Math.random() * 10))];
+    
+    let sum = n0 * 1 + n1 * 9;
+    nums.forEach((n, i) => sum += n * (8 - i));
+    
+    const checkDigit = (10 - (sum % 10)) % 10;
+    document.getElementById(isResident ? 'newResidentId' : 'personalId').value = city + nums.join('') + checkDigit;
+}
+
+// 3. 舊版居留證生成 (依據你提供的圖片規則)
+function generateOldResidentId() {
+    const city = getRandomCity();
+    const cityNum = CITY_CODE[city];
+    
+    // 性別碼 A-D
+    const sexLetters = ['A', 'B', 'C', 'D'];
+    const sexLetter = sexLetters[Math.floor(Math.random() * sexLetters.length)];
+    const sexNum = CITY_CODE[sexLetter] % 10; // 取轉換後的個位數
+    
+    let nums = Array.from({length: 7}, () => Math.floor(Math.random() * 10));
+    
+    let sum = Math.floor(cityNum / 10) * 1 + (cityNum % 10) * 9 + sexNum * 8;
+    nums.forEach((n, i) => sum += n * (7 - i));
+    
+    const checkDigit = (10 - (sum % 10)) % 10;
+    document.getElementById('oldResidentId').value = city + sexLetter + nums.join('') + checkDigit;
+}
+
+// 初始化
+window.onload = () => {
+    generateTaxId();
+    generatePersonalId();
+    generateNewResidentId();
+    generateOldResidentId();
+};
+
+function generatePersonalId() { generateTaiwanId(false); }
+function generateNewResidentId() { generateTaiwanId(true); }
+</script>
+
+</body>
+</html>
