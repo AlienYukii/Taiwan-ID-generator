@@ -2,23 +2,96 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>台灣證號自動生成器 (QA 版)</title>
+    <title>台灣證號自動生成器 </title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f9; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; color: #333; }
-        .item { margin-bottom: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #666; }
+        :root {
+            --bg-color: #000080;       /* 海軍藍背景 */
+            --card-bg: #000066;        /* 稍微深一點的藍色做卡片底色 */
+            --accent-color: #F5F5DC;   /* 米色副顏色 */
+            --input-bg: #00004d;       /* 輸入框背景 */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: var(--bg-color); 
+            color: var(--accent-color);
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 2.5rem; 
+            border-radius: 12px; 
+            border: 2px solid var(--accent-color); /* 用米色做邊框增加質感 */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+            width: 100%;
+            max-width: 450px; 
+        }
+
+        h2 { 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 15px; 
+            color: var(--accent-color);
+            text-align: center;
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+
+        .item { margin-bottom: 25px; }
+
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: var(--accent-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
         .result-wrapper { display: flex; gap: 10px; }
-        input { flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 1.1rem; }
-        button { cursor: pointer; background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 4px; transition: 0.2s; }
-        button:hover { background: #0056b3; }
+
+        input { 
+            flex-grow: 1; 
+            padding: 12px; 
+            border: 1px solid var(--accent-color); 
+            border-radius: 6px; 
+            background: var(--input-bg);
+            color: var(--accent-color);
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 1.2rem; 
+            outline: none;
+        }
+
+        /* 讓 Placeholder 或唯讀狀態的文字也清晰 */
+        input[readonly] {
+            cursor: default;
+        }
+
+        button { 
+            cursor: pointer; 
+            background: var(--accent-color); 
+            color: var(--bg-color); /* 按鈕文字用深藍色，對比度最高 */
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 6px; 
+            transition: 0.3s; 
+            font-weight: bold;
+        }
+
+        button:hover { 
+            filter: brightness(0.9); /* 懸停時稍微變深 */
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>證號自動生成器</h2>
+    <h2>統編生成器</h2>
     
     <div class="item">
         <label>統一編號</label>
@@ -37,7 +110,7 @@
     </div>
 
     <div class="item">
-        <label>新版居留證號 (2021後)</label>
+        <label>新版居留證號</label>
         <div class="result-wrapper">
             <input type="text" id="newResidentId" readonly>
             <button onclick="generateNewResidentId()">刷新</button>
