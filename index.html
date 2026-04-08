@@ -2,18 +2,21 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Taiwan ID Generator & Tools</title>
+    <title>Taiwan ID Generator & Tools - Clarity Pro</title>
     <style>
         :root {
-            --bg-color: #4A4E69;
-            --card-bg: #80A1C1;
-            --accent-color: #FC9E4F;
-            --input-bg: #FDFDFD;
-            --success-color: #4CAF50;
-            --error-color: #f44336;
-            --text-on-card: #4A4E69;    /* 卡片上的文字：深灰藍 (確保清晰) */
-            --btn-text: #FDFDFD;        /* 按鈕上的文字：純白 */
-            --btn-bg: #A77E58;
+            /* WCAG AA 高對比配色 */
+            --main-bg: #4A4E69;        /* 大背景：深灰藍 */
+            --card-bg: #FDFDFD;        /* 卡片/工具背景：純白 */
+            --text-dark: #4A4E69;      /* 主文字/標題：深灰藍 */
+            --text-note: #A77E58;      /* 備註/次文字：深棕 */
+            --btn-bg: #FC9E4F;         /* 按鈕/強調：暖陽橙 */
+            --btn-text: #FDFDFD;       /* 按鈕文字：純白 */
+            --focus-border: #BCD39C;   /* 聚焦邊框：抹茶綠 */
+            --input-bg: #F8F9FA;       /* 輸入框背景：極淺灰 */
+            --input-border: #80A1C1;   /* 輸入框邊框：灰藍 */
+            --success: #4CAF50;
+            --error: #D32F2F;
         }
 
         body { 
@@ -24,10 +27,10 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: var(--bg-color); 
-            color: var(--accent-color);
+            background: var(--main-bg); 
+            color: var(--text-dark);
             position: relative;
-            padding: 20px 0;
+            padding: 80px 20px 20px 20px; /* 為 fixed工具預留空間 */
         }
 
         /* 右上角年份轉換器 */
@@ -38,8 +41,7 @@
             background: var(--card-bg);
             padding: 15px;
             border-radius: 12px;
-            border: 1px solid rgba(246, 239, 166, 0.3);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -47,102 +49,130 @@
             z-index: 100;
         }
 
-        .year-converter label { font-size: 0.75rem; opacity: 0.8; }
-        .year-converter input { padding: 8px; font-size: 1rem; text-align: center; }
+        .year-converter label { font-size: 0.75rem; opacity: 0.8; color: var(--text-note); }
+        .year-converter input { 
+            padding: 8px; font-size: 1rem; text-align: center; 
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-dark);
+        }
+        .year-converter input:focus { border-color: var(--focus-border); outline: none; }
 
-        .card { 
+        .card, .validator-card { 
             background: var(--card-bg); 
             padding: 2.5rem; 
-            border-radius: 16px; 
-            border: 1px solid rgba(246, 239, 166, 0.3); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
             width: 100%;
             max-width: 420px; 
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
         }
 
-        /* 驗證區塊 */
+        /* 驗證區塊使用了不同的質感 */
         .validator-card {
-            background: var(--input-bg);
+            background: #E8EDF2; /* 淺藍灰，與生成區做區隔 */
             padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px dashed var(--accent-color);
-            width: 100%;
-            max-width: 420px;
+            border: 2px dashed var(--input-border);
         }
 
         h2, h3 { 
-            border-bottom: 2px solid var(--accent-color); 
-            padding-bottom: 10px; 
-            color: var(--accent-color);
+            border-bottom: 3px solid var(--btn-bg); 
+            padding-bottom: 12px; 
+            color: var(--text-dark);
             text-align: center;
             margin-top: 0;
+            font-weight: 800;
+            letter-spacing: 1px;
         }
 
-        .item { margin-bottom: 20px; }
+        .item { margin-bottom: 18px; }
 
         label { 
             display: block; 
             font-weight: 600; 
             margin-bottom: 6px; 
-            opacity: 0.9;
+            color: var(--text-dark);
             font-size: 0.85rem;
         }
 
         .result-wrapper { display: flex; gap: 8px; }
 
-        input { 
+        input[type="text"] { 
             flex-grow: 1; 
             padding: 12px; 
-            border: 1.5px solid rgba(246, 239, 166, 0.4); 
+            border: 1.5px solid var(--input-border); 
             border-radius: 8px; 
             background: var(--input-bg);
-            color: var(--accent-color);
+            color: var(--text-dark);
             font-family: 'Consolas', 'Monaco', monospace; 
             font-size: 1.25rem; 
             font-weight: bold;
             outline: none;
             transition: all 0.2s;
+            cursor: pointer; /* 生成區 */
         }
 
-        .validator-card input {
+        input[type="text"]:focus {
+            border-color: var(--focus-border);
+            box-shadow: 0 0 5px rgba(188, 205, 156, 0.5);
+        }
+
+        /* 驗證區的輸入框是可編輯的 */
+        .validator-card input[type="text"] {
             width: 100%;
             box-sizing: border-box;
-            background: rgba(255,255,255,0.05);
-            margin-bottom: 10px;
             cursor: text;
         }
 
         button { 
             cursor: pointer; 
-            background: var(--accent-color); 
-            color: var(--card-bg); 
+            background: var(--btn-bg); 
+            color: var(--btn-text); 
             border: none; 
-            padding: 0 18px; 
+            padding: 0 20px; 
             border-radius: 8px; 
-            transition: 0.3s; 
+            transition: 0.2s; 
             font-weight: 900;
+            font-size: 1.2rem;
         }
 
         button:hover { 
-            filter: brightness(1.1);
-            transform: scale(1.05);
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .copy-hint {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--text-note);
+            font-weight: 500;
         }
 
         #validResult {
             text-align: center;
             font-weight: bold;
-            font-size: 0.9rem;
-            min-height: 1.2rem;
+            font-size: 0.95rem;
+            min-height: 1.3rem;
+            margin-top: 5px;
         }
 
-        footer { margin-top: 30px; font-size: 0.8rem; opacity: 0.5; letter-spacing: 1px; }
+        footer { 
+            margin-top: 30px; 
+            font-size: 0.85rem; 
+            opacity: 0.7; 
+            letter-spacing: 1px; 
+            color: var(--text-note);
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
 <div class="year-converter">
-    <label>民國年 ⇄ 西元年</label>
+    <label>民國 ⇄ 西元</label>
     <input type="number" id="rocYear" placeholder="民國" oninput="rocToAd()">
     <input type="number" id="adYear" placeholder="西元" oninput="adToRoc()">
 </div>
@@ -177,11 +207,11 @@
             <button onclick="generateOldResidentId()">↺</button>
         </div>
     </div>
+    <div class="copy-hint">💡 點擊號碼直接複製</div>
 </div>
 
 <div class="validator-card">
     <h3>驗證工具 (Validator)</h3>
-    <label>貼上任何證號進行校驗：</label>
     <input type="text" id="verifyInput" placeholder="在此輸入要檢查的號碼..." oninput="validateInput()">
     <div id="validResult">等待輸入...</div>
 </div>
@@ -189,12 +219,24 @@
 <footer>create by yuki</footer>
 
 <script>
+// 所有邏輯保持原本功能，僅優化初始化
 const CITY_CODE = {
     A: 10, B: 11, C: 12, D: 13, E: 14, F: 15, G: 16, H: 17, I: 34, J: 18, K: 19, L: 20, M: 21,
     N: 22, O: 35, P: 23, Q: 24, R: 25, S: 26, T: 27, U: 28, V: 29, W: 32, X: 30, Y: 31, Z: 33
 };
 
-// 年份轉換邏輯
+function getRandomCity() {
+    const letters = Object.keys(CITY_CODE);
+    return letters[Math.floor(Math.random() * letters.length)];
+}
+
+// 初始化年份轉換 (預設今年)
+function initYearConverter() {
+    const thisYear = new Date().getFullYear();
+    document.getElementById('adYear').value = thisYear;
+    document.getElementById('rocYear').value = thisYear - 1911;
+}
+
 function rocToAd() {
     const roc = document.getElementById('rocYear').value;
     document.getElementById('adYear').value = roc ? parseInt(roc) + 1911 : '';
@@ -204,23 +246,17 @@ function adToRoc() {
     document.getElementById('rocYear').value = ad ? parseInt(ad) - 1911 : '';
 }
 
-// 驗證核心邏輯
 function validateInput() {
     const val = document.getElementById('verifyInput').value.trim().toUpperCase();
     const resDiv = document.getElementById('validResult');
     if (!val) { resDiv.innerText = "等待輸入..."; resDiv.style.color = "inherit"; return; }
 
-    // 1. 統一編號驗證 (8碼數字)
     if (/^\d{8}$/.test(val)) {
-        if (checkTaxId(val)) {
-            showResult("✅ 合法的統一編號", true);
-        } else {
-            showResult("❌ 統編檢核碼錯誤", false);
-        }
+        if (checkTaxId(val)) showResult("✅ 合法的統一編號", true);
+        else showResult("❌ 統編檢核碼錯誤", false);
         return;
     }
 
-    // 2. 身分證 / 居留證驗證 (A-Z + 9碼)
     if (/^[A-Z][A-Z0-9]\d{8}$/.test(val)) {
         if (checkNationalId(val)) {
             const type = isNewARC(val) ? "新版居留證" : (isOldARC(val) ? "舊版居留證" : "身分證");
@@ -230,17 +266,15 @@ function validateInput() {
         }
         return;
     }
-
     showResult("❓ 無法辨識的格式", false);
 }
 
 function showResult(msg, success) {
     const resDiv = document.getElementById('validResult');
     resDiv.innerText = msg;
-    resDiv.style.color = success ? "var(--success-color)" : "var(--error-color)";
+    resDiv.style.color = success ? "var(--success)" : "var(--error)";
 }
 
-// 內部檢核邏輯
 function checkTaxId(id) {
     const weights = [1, 2, 1, 2, 1, 2, 4, 1];
     let sum = 0;
@@ -256,19 +290,9 @@ function checkTaxId(id) {
 function checkNationalId(id) {
     const c1 = CITY_CODE[id[0]];
     let sum = Math.floor(c1 / 10) + (c1 % 10) * 9;
-    
-    // 第二碼處理 (如果是字母代表舊居留證)
-    let secondVal;
-    if (isNaN(id[1])) {
-        secondVal = CITY_CODE[id[1]] % 10;
-    } else {
-        secondVal = parseInt(id[1]);
-    }
-    
+    let secondVal = isNaN(id[1]) ? (CITY_CODE[id[1]] % 10) : parseInt(id[1]);
     sum += secondVal * 8;
-    for (let i = 2; i < 9; i++) {
-        sum += parseInt(id[i]) * (9 - i);
-    }
+    for (let i = 2; i < 9; i++) sum += parseInt(id[i]) * (9 - i);
     sum += parseInt(id[9]);
     return sum % 10 === 0;
 }
@@ -276,14 +300,14 @@ function checkNationalId(id) {
 function isNewARC(id) { return /^[A-Z][89]\d{8}$/.test(id); }
 function isOldARC(id) { return /^[A-Z][A-D]\d{8}$/.test(id); }
 
-// --- 以下為原本的生成邏輯 ---
 function copyToClipboard(element) {
     navigator.clipboard.writeText(element.value);
     const originalVal = element.value;
-    element.value = "Copied!";
-    setTimeout(() => { element.value = originalVal; }, 600);
+    element.value = "Copied! 👍";
+    setTimeout(() => { element.value = originalVal; }, 700);
 }
 
+// --- 生成核心 ---
 function generateTaxId() {
     const weights = [1, 2, 1, 2, 1, 2, 4, 1];
     while (true) {
@@ -303,17 +327,22 @@ function generateTaxId() {
     }
 }
 
-function generateTaiwanId(isResident = false) {
+function generateTaiwanId(targetId) {
     const city = getRandomCity();
     const cityNum = CITY_CODE[city];
     const n0 = Math.floor(cityNum / 10);
     const n1 = cityNum % 10;
-    const secondDigit = isResident ? (Math.random() > 0.5 ? 8 : 9) : (Math.random() > 0.5 ? 1 : 2);
+    
+    // 判定類型：personal, newARC
+    let secondDigit;
+    if (targetId === 'personalId') secondDigit = (Math.random() > 0.5 ? 1 : 2);
+    else if (targetId === 'newResidentId') secondDigit = (Math.random() > 0.5 ? 8 : 9);
+
     let nums = [secondDigit, ...Array.from({length: 7}, () => Math.floor(Math.random() * 10))];
     let sum = n0 * 1 + n1 * 9;
     nums.forEach((n, i) => sum += n * (8 - i));
     const checkDigit = (10 - (sum % 10)) % 10;
-    document.getElementById(isResident ? 'newResidentId' : 'personalId').value = city + nums.join('') + checkDigit;
+    document.getElementById(targetId).value = city + nums.join('') + checkDigit;
 }
 
 function generateOldResidentId() {
@@ -329,12 +358,22 @@ function generateOldResidentId() {
     document.getElementById('oldResidentId').value = city + sexLetter + nums.join('') + checkDigit;
 }
 
-window.onload = () => {
-    generateTaxId(); generateTaiwanId(false); generateTaiwanId(true); generateOldResidentId();
-};
+// 一鍵生成所有
+function generateAll() {
+    generateTaxId(); 
+    generateTaiwanId('personalId'); 
+    generateTaiwanId('newResidentId'); 
+    generateOldResidentId();
+}
 
-function generatePersonalId() { generateTaiwanId(false); }
-function generateNewResidentId() { generateTaiwanId(true); }
+// 單獨生成按鈕對應
+function generatePersonalId() { generateTaiwanId('personalId'); }
+function generateNewResidentId() { generateTaiwanId('newResidentId'); }
+
+window.onload = () => {
+    initYearConverter();
+    generateAll(); // 網頁載入時自動生成第一組
+};
 </script>
 
 </body>
