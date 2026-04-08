@@ -13,7 +13,7 @@
             --btn-bg: #F4D35E;         /* 按鈕/強調：鵝黃 */
             --btn-text: #FDFDFD;       /* 按鈕文字：純白 */
             --focus-border: #BAD4AA;   /* 聚焦邊框：灰草綠 */
-            --input-bg: #EBF5DF;       /* 輸入框背景：灰白 */
+            --input-bg: #F5F5F5;       /* 輸入框背景：菸白 */
             --input-border: #BAD4AA;   /* 輸入框邊框：灰草綠 */
             --success: #4CAF50;
             --error: #D32F2F;
@@ -72,7 +72,7 @@
 
         /* 驗證區塊使用了不同的質感 */
         .validator-card {
-            background: #E8EDF2; /* 淺藍灰，與生成區做區隔 */
+            background: #D2DEE3; /* 淺藍灰，與生成區做區隔 */
             padding: 1.5rem;
             border: 2px dashed var(--input-border);
         }
@@ -279,7 +279,7 @@ function validateInput() {
     resDiv.style.opacity = "1";
     if (/^\d{8}$/.test(val)) {
         if (checkTaxId(val)) showResult("good合法", true);
-        else showResult("bad統編檢核碼錯誤", false);
+        else showResult("nono統編檢核碼錯誤", false);
         return;
     }
 
@@ -288,7 +288,7 @@ function validateInput() {
             const type = isNewARC(val) ? "新版居留證" : (isOldARC(val) ? "舊版居留證" : "身分證");
             showResult(`good 合法的${type}`, true);
         } else {
-            showResult("bad 證號格式或檢核碼錯誤", false);
+            showResult("nono證號格式或檢核碼錯誤", false);
         }
         return;
     }
