@@ -329,7 +329,7 @@ function isOldARC(id) { return /^[A-Z][A-D]\d{8}$/.test(id); }
 function copyToClipboard(element) {
     navigator.clipboard.writeText(element.value);
     const originalVal = element.value;
-    element.value = "Copied! 👍";
+    element.value = "摳皮成功";
     setTimeout(() => { element.value = originalVal; }, 700);
 }
 
