@@ -230,6 +230,13 @@
             <button onclick="generateOldResidentId()">↺</button>
         </div>
     </div>
+    <div class="item">
+        <label>玉山測試卡號 (Esun Test Card)</label>
+        <div class="result-wrapper">
+            <input type="text" id="esunCardId" readonly onclick="copyToClipboard(this)">
+            <button onclick="generateEsunCardId()">↺</button>
+        </div>
+    </div>
     <div class="copy-hint">👙 點擊號碼即可複製^^</div>
 </div>
 
@@ -383,11 +390,38 @@ function generateOldResidentId() {
     document.getElementById('oldResidentId').value = city + sexLetter + nums.join('') + checkDigit;
 }
 
+function generateEsunCardId() {
+    // 玉山世界商務卡 BIN(預留值,如有正確 BIN 請替換)
+    const BIN = [5, 2, 0, 1, 4, 9];
+    let cardNumbers = [...BIN];
+
+    // 隨機產生中間的 9 碼個人帳號
+    for (let i = 0; i < 9; i++) {
+        cardNumbers.push(Math.floor(Math.random() * 10));
+    }
+
+    // Luhn 演算法計算第 16 碼檢查碼
+    let sum = 0;
+    for (let i = 0; i < 15; i++) {
+        let digit = cardNumbers[i];
+        if (i % 2 === 0) {
+            digit *= 2;
+            if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+    }
+    const checkDigit = (10 - (sum % 10)) % 10;
+    cardNumbers.push(checkDigit);
+
+    document.getElementById('esunCardId').value = cardNumbers.join('');
+}
+
 function generateAll() {
     generateTaxId(); 
     generateTaiwanId('personalId'); 
     generateTaiwanId('newResidentId'); 
     generateOldResidentId();
+    generateEsunCardId();
 }
 
 function generatePersonalId() { generateTaiwanId('personalId'); }
